@@ -3,14 +3,14 @@
 namespace Faker\Provider;
 
 /**
- * Depends on image generation from http://lorempixel.com/
+ * Depends on image generation from https://fakeimg.pl for image
  */
 class Image extends Base
 {
     /**
      * @var string
      */
-    public const BASE_URL = 'https://via.placeholder.com';
+    public const BASE_URL = 'https://fakeimg.pl';
 
     public const FORMAT_JPG = 'jpg';
     public const FORMAT_JPEG = 'jpeg';
@@ -69,7 +69,7 @@ class Image extends Base
             ));
         }
 
-        $size = sprintf('%dx%d.%s', $width, $height, $format);
+        $size = sprintf('%dx%d', $width, $height);
 
         $imageParts = [];
 
@@ -87,11 +87,13 @@ class Image extends Base
 
         $backgroundColor = $gray === true ? 'CCCCCC' : str_replace('#', '', Color::safeHexColor());
 
+        // https://fakeimg.pl/350x200/609772/184/?text=Hello
         return sprintf(
-            '%s/%s/%s%s',
+            '%s/%s/%s/%s/%s',
             self::BASE_URL,
             $size,
             $backgroundColor,
+            str_pad(mt_rand( 0, 255 ), 3, '0', STR_PAD_LEFT),
             count($imageParts) > 0 ? '?text=' . urlencode(implode(' ', $imageParts)) : ''
         );
     }
@@ -143,9 +145,6 @@ class Image extends Base
             $ch = curl_init($url);
             curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (X11; Linux x86_64; rv:104.0) Gecko/20100101 Firefox/104.0");
             curl_setopt($ch, CURLOPT_FILE, $fp);
-            curl_setopt($ch, CURLOPT_COOKIE, "__cf_bm=");
-            curl_setopt($ch, CURLOPT_COOKIESESSION, true);
-            curl_setopt($ch, CURLOPT_COOKIELIST, "ALL");
             $success = curl_exec($ch) && curl_getinfo($ch, CURLINFO_HTTP_CODE) === 200;
             fclose($fp);
             curl_close($ch);
@@ -154,7 +153,7 @@ class Image extends Base
                 unlink($filepath);
 
                 // could not contact the distant URL or HTTP error - fail silently.
-                return false;
+                return $url;
             }
         } elseif (ini_get('allow_url_fopen')) {
             // use remote fopen() via copy()
