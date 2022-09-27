@@ -3,14 +3,15 @@
 namespace Faker\Provider;
 
 /**
- * Depends on image generation from https://fakeimg.pl for image
+ * Depends on image generation from https://dummyimage.com for image
  */
 class Image extends Base
 {
     /**
      * @var string
      */
-    public const BASE_URL = 'https://fakeimg.pl';
+    // public const BASE_URL = 'https://fakeimg.pl';
+    public const BASE_URL = 'https://dummyimage.com';
 
     public const FORMAT_JPG = 'jpg';
     public const FORMAT_JPEG = 'jpeg';
@@ -88,13 +89,14 @@ class Image extends Base
         $backgroundColor = $gray === true ? 'CCCCCC' : str_replace('#', '', Color::safeHexColor());
 
         // https://fakeimg.pl/350x200/609772/184/?text=Hello
+        // https://dummyimage.com/600x400/520e52/404370.png&text=Test
         return sprintf(
-            '%s/%s/%s/%s/%s',
+            '%s/%s/%s/%s.png%s',
             self::BASE_URL,
             $size,
             $backgroundColor,
-            str_pad(mt_rand( 0, 255 ), 3, '0', STR_PAD_LEFT),
-            count($imageParts) > 0 ? '?text=' . urlencode(implode(' ', $imageParts)) : ''
+            str_replace('#', '', Color::safeHexColor()),
+            count($imageParts) > 0 ? '&text=' . urlencode(implode(' ', $imageParts)) : ''
         );
     }
 
